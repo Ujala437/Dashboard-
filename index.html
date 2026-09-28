@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Todo List | Developer Ujala</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --sidebar:#111827;
+    --background:#f4f7fc;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#7b8495;
+    --border:#e4e8ef;
+    --blue:#2563eb;
+    --blue2:#1d4ed8;
+    --green:#16a36a;
+    --yellow:#f5ad00;
+    --red:#ef4444;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--background);
+    color:var(--text);
+    overflow-x:hidden;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:170px;
+    height:100vh;
+    background:var(--sidebar);
+    color:white;
+    padding:18px 12px;
+    z-index:100;
+}
+
+.logo{
+    font-size:17px;
+    font-weight:bold;
+    padding:4px 8px 25px;
+}
+
+.logo span{
+    color:#60a5fa;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.menu button{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#b8c0cf;
+    padding:11px 8px;
+    text-align:left;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:10px;
+    transition:.2s;
+}
+
+.menu button:hover,
+.menu button.active{
+    background:#202a3c;
+    color:white;
+}
+
+.menu-icon{
+    margin-right:5px;
+}
+
+.side-count{
+    float:right;
+    color:#7da8ff;
+}
+
+/* DARK MODE BUTTON */
+
+.theme{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:18px;
+}
+
+.theme button{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#b8c0cf;
+    text-align:left;
+    padding:10px 8px;
+    cursor:pointer;
+    font-size:10px;
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    margin-left:170px;
+    width:calc(100% - 170px);
+    min-height:100vh;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    height:58px;
+    background:white;
+    border-bottom:1px solid var(--border);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 25px;
+}
+
+.header-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.header-title{
+    font-size:17px;
+    font-weight:bold;
+}
+
+.header-left small{
+    color:var(--muted);
+    font-size:9px;
+}
+
+.developer{
+    font-size:11px;
+    font-weight:bold;
+    color:var(--blue);
+    white-space:nowrap;
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+    padding:28px 25px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+/* ================= TITLE ================= */
+
+.dashboard-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:14px;
+}
+
+.dashboard-title h2{
+    font-size:15px;
+}
+
+.dashboard-title p{
+    font-size:10px;
+    color:var(--muted);
+    margin-top:4px;
+}
+
+.add-btn{
+    border:0;
+    background:var(--blue);
+    color:white;
+    padding:9px 13px;
+    border-radius:6px;
+    font-size:10px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.add-btn:hover{
+    background:var(--blue2);
+}
+
+/* ================= STATS ================= */
+
+.stats{
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    background:white;
+    border:1px solid var(--border);
+    border-radius:8px;
+
+    padding:9px 12px;
+
+    width:max-content;
+    max-width:100%;
+
+    margin-bottom:9px;
+}
+
+.stat{
+    font-size:9px;
+    color:var(--muted);
+    white-space:nowrap;
+}
+
+.stat strong{
+    color:var(--blue);
+    margin-left:3px;
+}
+
+.divider{
+    color:#cbd2dc;
+}
+
+.task-count{
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:18px;
+}
+
+/* ================= PROGRESS ================= */
+
+.progress-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:17px;
+    box-shadow:0 3px 12px rgba(0,0,0,.04);
+}
+
+.progress-title{
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:12px;
+}
+
+.progress{
+    width:100%;
+    height:9px;
+    background:#e5eaf1;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:var(--blue);
+    border-radius:20px;
+    transition:.4s;
+}
+
+.progress-info{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:9px;
+    color:var(--muted);
+}
+
+.progress-info strong{
+    color:var(--text);
+}
+
+/* ================= PAGE HEADING ================= */
+
+.page-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.page-heading h2{
+    font-size:16px;
+}
+
+.page-heading p{
+    font-size:10px;
+    color:var(--muted);
+    margin-top:4px;
+}
+
+/* ================= SEARCH ================= */
+
+.search{
+    width:100%;
+    padding:10px;
+
+    border:1px solid var(--border);
+    border-radius:7px;
+
+    outline:none;
+    margin-bottom:12px;
+
+    font-size:11px;
+}
+
+/* ================= TASK ================= */
+
+.task-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.task{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:8px;
+
+    padding:11px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.check{
+    width:16px;
+    height:16px;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.task-info{
+    flex:1;
+    min-width:0;
+}
+
+.task-name{
+    font-size:11px;
+    font-weight:bold;
+    word-break:break-word;
+}
+
+.task-desc{
+    font-size:9px;
+    color:var(--muted);
+    margin-top:3px;
+    word-break:break-word;
+}
+
+.completed .task-name{
+    text-decoration:line-through;
+    opacity:.5;
+}
+
+.completed .task-desc{
+    text-decoration:line-through;
+}
+
+.priority{
+    font-size:7px;
+    padding:4px 6px;
+    border-radius:20px;
+    flex-shrink:0;
+}
+
+.high{
+    background:#ffe3e3;
+    color:#d33;
+}
+
+.normal{
+    background:#e5ebff;
+    color:#3159c8;
+}
+
+.low{
+    background:#dff7e9;
+    color:#16824d;
+}
+
+.star{
+    border:0;
+    background:none;
+    cursor:pointer;
+    color:#b7bdc8;
+    font-size:16px;
+    flex-shrink:0;
+}
+
+.star.important{
+    color:var(--yellow);
+}
+
+.delete{
+    border:0;
+    background:#ffe7e7;
+    color:#d33;
+
+    border-radius:5px;
+
+    width:27px;
+    height:27px;
+
+    cursor:pointer;
+    font-size:11px;
+    flex-shrink:0;
+}
+
+/* ================= EMPTY ================= */
+
+.empty{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:8px;
+
+    padding:30px 15px;
+
+    text-align:center;
+
+    color:var(--muted);
+    font-size:10px;
+}
+
+/* ================= FORM ================= */
+
+.form{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:9px;
+
+    padding:18px;
+
+    max-width:550px;
+}
+
+.form label{
+    display:block;
+
+    font-size:10px;
+    font-weight:bold;
+
+    margin:12px 0 5px;
+}
+
+.form input,
+.form textarea,
+.form select{
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid var(--border);
+    border-radius:6px;
+
+    outline:none;
+
+    font-size:10px;
+}
+
+.form textarea{
+    min-height:80px;
+    resize:vertical;
+}
+
+.important-box{
+    display:flex !important;
+    align-items:center;
+    gap:6px;
+
+    font-size:10px !important;
+}
+
+.important-box input{
+    width:auto !important;
+}
+
+.create{
+    width:100%;
+    margin-top:8px;
+}
+
+/* ================= DARK MODE ================= */
+
+body.dark{
+    --background:#0e1420;
+    --card:#182131;
+    --text:#edf2f8;
+    --muted:#9ca8ba;
+    --border:#293447;
+}
+
+body.dark .header{
+    background:#182131;
+    border-color:#293447;
+}
+
+body.dark .stats,
+body.dark .progress-card,
+body.dark .task,
+body.dark .form,
+body.dark .empty{
+    background:#182131;
+    border-color:#293447;
+}
+
+body.dark .search,
+body.dark .form input,
+body.dark .form textarea,
+body.dark .form select{
+    background:#111927;
+    color:white;
+    border-color:#293447;
+}
+
+body.dark .progress{
+    background:#303b4d;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:600px){
+
+    .sidebar{
+        width:170px;
+    }
+
+    .main{
+        margin-left:170px;
+        width:calc(100% - 170px);
+    }
+
+    .header{
+        height:56px;
+        padding:0 15px;
+    }
+
+    .header-title{
+        font-size:14px;
+    }
+
+    .developer{
+        font-size:9px;
+    }
+
+    .content{
+        padding:22px 14px;
+    }
+
+    .dashboard-title{
+        align-items:flex-start;
+    }
+
+    .dashboard-title h2{
+        font-size:14px;
+    }
+
+    .dashboard-title p{
+        font-size:8px;
+    }
+
+    .add-btn{
+        padding:8px 9px;
+        font-size:9px;
+    }
+
+    .stats{
+        width:100%;
+        overflow:hidden;
+        padding:8px;
+    }
+
+    .stat{
+        font-size:8px;
+    }
+
+    .progress-card{
+        padding:14px;
+    }
+
+    .task{
+        padding:9px;
+    }
+
+    .priority{
+        display:none;
+    }
+}
+
+/* ================= VERY SMALL PHONE ================= */
+
+@media(max-width:380px){
+
+    .sidebar{
+        width:145px;
+    }
+
+    .main{
+        margin-left:145px;
+        width:calc(100% - 145px);
+    }
+
+    .logo{
+        font-size:15px;
+    }
+
+    .menu button{
+        font-size:9px;
+        padding:10px 6px;
+    }
+
+    .content{
+        padding:18px 9px;
+    }
+
+    .header{
+        padding:0 9px;
+    }
+
+    .header-title{
+        font-size:12px;
+    }
+
+    .developer{
+        font-size:8px;
+    }
+
+    .dashboard-title{
+        gap:5px;
+    }
+
+    .dashboard-title h2{
+        font-size:12px;
+    }
+
+    .add-btn{
+        font-size:8px;
+        padding:7px;
+    }
+
+    .stats{
+        display:block;
+        line-height:20px;
+    }
+
+    .stat{
+        display:inline-block;
+        margin-right:3px;
+    }
+
+    .divider{
+        margin-right:3px;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        ✓ <span>Todo List</span>
+    </div>
+
+    <div class="menu">
+
+        <button class="active"
+                onclick="showPage('dashboard',this)">
+            🏠 Dashboard
+        </button>
+
+        <button onclick="showPage('tasks',this)">
+            📝 My Tasks
+        </button>
+
+        <button onclick="showPage('important',this)">
+            ⭐ Important
+            <span class="side-count" id="importantCount">0</span>
+        </button>
+
+        <button onclick="showPage('pending',this)">
+            ◷ Pending
+            <span class="side-count" id="pendingCount">0</span>
+        </button>
+
+        <button onclick="showPage('completed',this)">
+            ✓ Completed
+        </button>
+
+    </div>
+
+    <div class="theme">
+
+        <button onclick="toggleDark()">
+            <span id="themeIcon">◐</span>
+            <span id="themeText">Dark Mode</span>
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <div class="header-title"
+                 id="headerTitle">
+                Todo List
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE DEVELOPER NAME -->
+
+       <br> <div class="developer">
+            Developer Ujala
+        </div>
+
+    </header>
+
+
+    <!-- ================= CONTENT ================= -->
+
+    <div class="content">
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboard"
+                 class="page active">
+
+            <div class="dashboard-title">
+
+                <div>
+
+                    <h2>My Tasks</h2>
+
+                    <p>
+                        Manage your daily tasks
+                    </p>
+
+                </div>
+
+                <button class="add-btn"
+                        onclick="showPage('add')">
+
+                    + Add Task
+
+                </button>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <span class="stat">
+                    Total:
+                    <strong id="total">0</strong>
+                </span>
+
+                <span class="divider">|</span>
+
+                <span class="stat">
+                    Completed:
+                    <strong id="completed">0</strong>
+                </span>
+
+                <span class="divider">|</span>
+
+                <span class="stat">
+                    Pending:
+                    <strong id="pending">0</strong>
+                </span>
+
+            </div>
+
+
+            <div class="task-count">
+                <span id="taskCount">0</span> tasks
+            </div>
+
+
+            <!-- PROGRESS -->
+
+            <div class="progress-card">
+
+                <div class="progress-title">
+                    Task Progress
+                </div>
+
+                <div class="progress">
+
+                    <div class="progress-bar"
+                         id="progressBar">
+                    </div>
+
+                </div>
+
+                <div class="progress-info">
+
+                    <span>
+                        Completed:
+                        <strong id="completedPercent">
+                            0%
+                        </strong>
+                    </span>
+
+                    <span>
+                        Pending:
+                        <strong id="pendingPercent">
+                            0%
+                        </strong>
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT TASKS -->
+
+            <div style="margin-top:18px;">
+
+                <div class="page-heading">
+
+                    <div>
+                        <h2>Recent Tasks</h2>
+                    </div>
+
+                </div>
+
+                <div id="dashboardTasks"
+                     class="task-list">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MY TASKS ================= -->
+
+        <section id="tasks"
+                 class="page">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>My Tasks</h2>
+
+                    <p>All your tasks</p>
+
+                </div>
+
+                <button class="add-btn"
+                        onclick="showPage('add')">
+
+                    + Add Task
+
+                </button>
+
+            </div>
+
+
+            <input
+                class="search"
+                id="search"
+                type="text"
+                placeholder="Search task..."
+                oninput="render()">
+
+
+            <div id="allTasks"
+                 class="task-list">
+            </div>
+
+        </section>
+
+
+        <!-- ================= IMPORTANT ================= -->
+
+        <section id="important"
+                 class="page">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>⭐ Important</h2>
+
+                    <p>Important tasks</p>
+
+                </div>
+
+            </div>
+
+            <div id="importantTasks"
+                 class="task-list">
+            </div>
+
+        </section>
+
+
+        <!-- ================= PENDING ================= -->
+
+        <section id="pending"
+                 class="page">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>◷ Pending Tasks</h2>
+
+                    <p>Tasks that need to be completed</p>
+
+                </div>
+
+            </div>
+
+            <div id="pendingTasks"
+                 class="task-list">
+            </div>
+
+        </section>
+
+
+        <!-- ================= COMPLETED ================= -->
+
+        <section id="completed"
+                 class="page">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>✓ Completed Tasks</h2>
+
+                    <p>Your completed work</p>
+
+                </div>
+
+            </div>
+
+            <div id="completedTasks"
+                 class="task-list">
+            </div>
+
+        </section>
+
+
+        <!-- ================= ADD TASK ================= -->
+
+        <section id="add"
+                 class="page">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>Add New Task</h2>
+
+                    <p>Create a new task</p>
+
+                </div>
+
+            </div>
+
+
+            <form class="form"
+                  id="taskForm">
+
+                <label>
+                    Task Name
+                </label>
+
+                <input
+                    id="taskName"
+                    type="text"
+                    placeholder="Enter task name..."
+                    required>
+
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="taskDescription"
+                    placeholder="Enter description...">
+                </textarea>
+
+
+                <label>
+                    Priority
+                </label>
+
+                <select id="priority">
+
+                    <option value="normal">
+                        Normal
+                    </option>
+
+                    <option value="high">
+                        High
+                    </option>
+
+                    <option value="low">
+                        Low
+                    </option>
+
+                </select>
+
+
+                <label class="important-box">
+
+                    <input
+                        id="important"
+                        type="checkbox">
+
+                    ⭐ Mark as Important
+
+                </label>
+
+
+                <button
+                    class="add-btn create"
+                    type="submit">
+
+                    + Create Task
+
+                </button>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script>
+
+/* ================= DATA ================= */
+
+let tasks =
+    JSON.parse(
+        localStorage.getItem("ujalaTodo")
+    ) || [];
+
+
+/* ================= SAVE ================= */
+
+function save(){
+
+    localStorage.setItem(
+        "ujalaTodo",
+        JSON.stringify(tasks)
+    );
+
+}
+
+
+/* ================= PAGE ================= */
+
+function showPage(page,button){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(function(p){
+
+            p.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(page)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".menu button")
+        .forEach(function(b){
+
+            b.classList.remove("active");
+
+        });
+
+
+    if(button){
+        button.classList.add("active");
+    }
+
+
+    let title="Todo List";
+
+
+    if(page==="tasks")
+        title="My Tasks";
+
+    if(page==="important")
+        title="Important";
+
+    if(page==="pending")
+        title="Pending";
+
+    if(page==="completed")
+        title="Completed";
+
+    if(page==="add")
+        title="Add Task";
+
+
+    document
+        .getElementById("headerTitle")
+        .textContent=title;
+
+
+    render();
+
+    update();
+
+}
+
+
+/* ================= ADD TASK ================= */
+
+document
+    .getElementById("taskForm")
+    .addEventListener(
+        "submit",
+        function(e){
+
+            e.preventDefault();
+
+
+            let name=
+                document
+                .getElementById("taskName")
+                .value
+                .trim();
+
+
+            let description=
+                document
+                .getElementById("taskDescription")
+                .value
+                .trim();
+
+
+            let priority=
+                document
+                .getElementById("priority")
+                .value;
+
+
+            let important=
+                document
+                .getElementById("important")
+                .checked;
+
+
+            if(!name){
+
+                alert("Please enter task name.");
+
+                return;
+
+            }
+
+
+            tasks.unshift({
+
+                id:Date.now(),
+
+                name:name,
+
+                description:description,
+
+                priority:priority,
+
+                important:important,
+
+                completed:false
+
+            });
+
+
+            save();
+
+
+            document
+                .getElementById("taskForm")
+                .reset();
+
+
+            update();
+
+            render();
+
+
+            showPage("tasks");
+
+        }
+    );
+
+
+/* ================= COMPLETE ================= */
+
+function completeTask(id){
+
+    let task=
+        tasks.find(function(t){
+
+            return t.id===id;
+
+        });
+
+
+    if(task){
+
+        task.completed=
+            !task.completed;
+
+        save();
+
+        render();
+
+        update();
+
+    }
+
+}
+
+
+/* ================= IMPORTANT ================= */
+
+function importantTask(id){
+
+    let task=
+        tasks.find(function(t){
+
+            return t.id===id;
+
+        });
+
+
+    if(task){
+
+        task.important=
+            !task.important;
+
+        save();
+
+        render();
+
+        update();
+
+    }
+
+}
+
+
+/* ================= DELETE ================= */
+
+function deleteTask(id){
+
+    if(
+        !confirm("Delete this task?")
+    ){
+        return;
+    }
+
+
+    tasks=
+        tasks.filter(function(t){
+
+            return t.id!==id;
+
+        });
+
+
+    save();
+
+    render();
+
+    update();
+
+}
+
+
+/* ================= SAFE TEXT ================= */
+
+function safe(text){
+
+    let div=
+        document.createElement("div");
+
+    div.textContent=text;
+
+    return div.innerHTML;
+
+}
+
+
+/* ================= TASK HTML ================= */
+
+function taskHTML(task){
+
+    return `
+
+    <div class="task
+        ${task.completed ? "completed" : ""}">
+
+        <input
+            class="check"
+            type="checkbox"
+
+            ${task.completed ? "checked" : ""}
+
+            onchange="
+                completeTask(${task.id})
+            ">
+
+
+        <div class="task-info">
+
+            <div class="task-name">
+
+                ${safe(task.name)}
+
+            </div>
+
+
+            ${
+                task.description
+                ?
+                `
+                <div class="task-desc">
+
+                    ${safe(task.description)}
+
+                </div>
+                `
+                :
+                ""
+            }
+
+        </div>
+
+
+        <span class="
+            priority
+            ${task.priority}">
+
+            ${task.priority}
+
+        </span>
+
+
+        <button
+            class="
+                star
+                ${task.important ? "important" : ""}
+            "
+
+            onclick="
+                importantTask(${task.id})
+            ">
+
+            ${task.important ? "★" : "☆"}
+
+        </button>
+
+
+        <button
+            class="delete"
+
+            onclick="
+                deleteTask(${task.id})
+            ">
+
+            🗑
+
+        </button>
+
+    </div>
+
+    `;
+
+}
+
+
+/* ================= EMPTY ================= */
+
+function empty(message){
+
+    return `
+
+        <div class="empty">
+
+            ${message}
+
+        </div>
+
+    `;
+
+}
+
+
+/* ================= RENDER ================= */
+
+function render(){
+
+    let searchElement=
+        document.getElementById("search");
+
+
+    let search=
+        searchElement
+        ?
+        searchElement.value
+        .toLowerCase()
+        .trim()
+        :
+        "";
+
+
+    let filtered=
+        tasks.filter(function(t){
+
+            return t.name
+                .toLowerCase()
+                .includes(search);
+
+        });
+
+
+    /* ALL */
+
+    document
+        .getElementById("allTasks")
+        .innerHTML=
+
+        filtered.length
+        ?
+        filtered.map(taskHTML).join("")
+        :
+        empty("📋 No tasks found.");
+
+
+
+    /* IMPORTANT */
+
+    let important=
+        tasks.filter(function(t){
+
+            return t.important;
+
+        });
+
+
+    document
+        .getElementById("importantTasks")
+        .innerHTML=
+
+        important.length
+        ?
+        important.map(taskHTML).join("")
+        :
+        empty("⭐ No important tasks.");
+
+
+
+    /* PENDING */
+
+    let pending=
+        tasks.filter(function(t){
+
+            return !t.completed;
+
+        });
+
+
+    document
+        .getElementById("pendingTasks")
+        .innerHTML=
+
+        pending.length
+        ?
+        pending.map(taskHTML).join("")
+        :
+        empty("🎉 No pending tasks.");
+
+
+
+    /* COMPLETED */
+
+    let completed=
+        tasks.filter(function(t){
+
+            return t.completed;
+
+        });
+
+
+    document
+        .getElementById("completedTasks")
+        .innerHTML=
+
+        completed.length
+        ?
+        completed.map(taskHTML).join("")
+        :
+        empty("✓ No completed tasks.");
+
+
+
+    /* DASHBOARD */
+
+    let recent=
+        tasks.slice(0,5);
+
+
+    document
+        .getElementById("dashboardTasks")
+        .innerHTML=
+
+        recent.length
+        ?
+        recent.map(taskHTML).join("")
+        :
+        empty(
+            "📋 No tasks yet. Add your first task."
+        );
+
+}
+
+
+/* ================= UPDATE ================= */
+
+function update(){
+
+    let total=
+        tasks.length;
+
+
+    let completed=
+        tasks.filter(function(t){
+
+            return t.completed;
+
+        }).length;
+
+
+    let pending=
+        total-completed;
+
+
+    let important=
+        tasks.filter(function(t){
+
+            return t.important;
+
+        }).length;
+
+
+    document
+        .getElementById("total")
+        .textContent=total;
+
+
+    document
+        .getElementById("completed")
+        .textContent=completed;
+
+
+    document
+        .getElementById("pending")
+        .textContent=pending;
+
+
+    document
+        .getElementById("taskCount")
+        .textContent=total;
+
+
+    document
+        .getElementById("importantCount")
+        .textContent=important;
+
+
+    document
+        .getElementById("pendingCount")
+        .textContent=pending;
+
+
+    let completedPercent=
+        total
+        ?
+        Math.round(
+            completed/total*100
+        )
+        :
+        0;
+
+
+    let pendingPercent=
+        total
+        ?
+        Math.round(
+            pending/total*100
+        )
+        :
+        0;
+
+
+    document
+        .getElementById("completedPercent")
+        .textContent=
+        completedPercent+"%";
+
+
+    document
+        .getElementById("pendingPercent")
+        .textContent=
+        pendingPercent+"%";
+
+
+    document
+        .getElementById("progressBar")
+        .style.width=
+        completedPercent+"%";
+
+}
+
+
+/* ================= DARK MODE ================= */
+
+function toggleDark(){
+
+    document
+        .body
+        .classList
+        .toggle("dark");
+
+
+    let dark=
+        document
+        .body
+        .classList
+        .contains("dark");
+
+
+    localStorage.setItem(
+        "ujalaDark",
+        dark ? "yes" : "no"
+    );
+
+
+    document
+        .getElementById("themeIcon")
+        .textContent=
+        dark ? "☀" : "◐";
+
+
+    document
+        .getElementById("themeText")
+        .textContent=
+        dark
+        ?
+        "Light Mode"
+        :
+        "Dark Mode";
+
+}
+
+
+/* ================= LOAD DARK MODE ================= */
+
+if(
+    localStorage.getItem("ujalaDark")
+    ==="yes"
+){
+
+    document
+        .body
+        .classList
+        .add("dark");
+
+
+    document
+        .getElementById("themeIcon")
+        .textContent="☀";
+
+
+    document
+        .getElementById("themeText")
+        .textContent="Light Mode";
+
+}
+
+
+/* ================= START ================= */
+
+render();
+
+update();
+
+</script>
+
+</body>
+</html>
